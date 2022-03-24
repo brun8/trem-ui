@@ -4,7 +4,11 @@ import { gql } from '@apollo/client';
 import client from 'lib/apollo-client';
 
 
-export default function FormPage({ list }: any) {
+type FormPageProps = {
+  list: List;
+}
+
+export default function FormPage({ list }: FormPageProps) {
   console.log(list);
   return (
     <div className="flex flex-col gap-8 h-full p-12 items-center">
@@ -15,7 +19,7 @@ export default function FormPage({ list }: any) {
       </div>
       <div className='w-4/5 max-w-xl border-2 border-black p-8 rounded-xl'>
         <div className='grid gap-4 items-center' style={{gridTemplateColumns: "1fr auto auto auto"}}>
-          {list.type.files.map((file: any) => (
+          {list.type?.files?.map((file: any) => (
             <>
               <div key={file.id} className="px-4 text-lg font-semibold">
                 {file.name}
@@ -34,6 +38,13 @@ export default function FormPage({ list }: any) {
             </>
           ))}
         </div>
+      </div>
+      <div>
+        {list.uploads?.map((up)=> (
+          <div key={up.id} className=''>
+            {up.fileType.name}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -59,6 +70,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             }
           }
           uploads {
+            id
             file {
               filename
             }
@@ -76,5 +88,29 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       list: data.list,
     }
   }
+}
+
+type List = {
+  id: string;
+  title: string;
+  type?: ListType;
+  uploads?: Upload[];
+}
+
+type ListType = {
+  id: string;
+  name: string;
+  files?: FileType[];
+}
+
+type FileType = {
+  name: string;
+  extenions?: string;
+}
+
+type Upload = {
+  id: string;
+  file?: { filename: string }
+  fileType: FileType;
 }
 
